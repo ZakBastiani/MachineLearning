@@ -1,4 +1,6 @@
 import tree
+import math
+
 
 class DecisionTree:
     def __init__(self, test_data, gain_type, max_depth):
