@@ -45,17 +45,27 @@ attributes_types = {
 }
 train_df = pd.read_csv(train_data_csv, names=attributes)
 test_df = pd.read_csv(test_data_csv, names=attributes)
+
 all_data = pd.concat([train_df, test_df])
-for a in attributes:
-    if attributes_types[a][0] == 'numeric':
-        median = train_df[train_df[a] != 'unknown'][a].astype(float).median()
-        train_df[train_df[a].astype(float) > median] = "high"
-        train_df[train_df[a].astype(float) <= median] = "low"
-        test_df[train_df[a].astype(float) > median] = "high"
-        test_df[train_df[a].astype(float) <= median] = "low"
 
+tree = decisiontree.DecisionTree(train_df, attributes_types, decisiontree.DecisionTree.IG_ID, 16)
+acc = tree.testdata(all_data)
+print(acc)
 
+print("IG Gain:")
 for i in range(1, 16):
     tree = decisiontree.DecisionTree(train_df, attributes_types, decisiontree.DecisionTree.IG_ID, i)
     acc = tree.testdata(all_data)
-    print(acc)
+    print("Depth : " + str(i) + ", Accuracy: " + str(acc))
+
+print("ME Gain:")
+for i in range(1, 16):
+    tree = decisiontree.DecisionTree(train_df, attributes_types, decisiontree.DecisionTree.ME_ID, i)
+    acc = tree.testdata(all_data)
+    print("Depth : " + str(i) + ", Accuracy: " + str(acc))
+
+print("GI Gain:")
+for i in range(1, 16):
+    tree = decisiontree.DecisionTree(train_df, attributes_types, decisiontree.DecisionTree.GI_ID, i)
+    acc = tree.testdata(all_data)
+    print("Depth : " + str(i) + ", Accuracy: " + str(acc))
