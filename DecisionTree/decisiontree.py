@@ -22,9 +22,13 @@ class DecisionTree:
         self.data = train_data
         self.max_depth = max_depth
         self.gain = self.IG
+        if gain_type == self.ME_ID:
+            self.gain = self.ME
+        if gain_type == self.GI_ID:
+            self.gain = self.GI
         self.label = self.data.columns[-1]
         self.types = attribute_types
-        self.root = self.buildtree(self.data, 1)
+        self.root = self.buildtree(self.data, 0)
 
     def buildtree(self, current_Set, depth):
         attributes = current_Set.columns[:-1]
@@ -74,20 +78,21 @@ class DecisionTree:
         return output
 
     def ME(self, set_A, attribute):
-        output = 0
         me = []
         for l in pd.unique(set_A[self.label]):
             prob = set_A[set_A[self.label] == l][self.label].count()/set_A[self.label].count()
             me.append(-prob*math.log2(prob))
-        output = me.sort()[1]
+        me.sort(reverse=True)
+        output = 1 - me[0]
         types = pd.unique(set_A[attribute])
         for t in types:
             set_ratio = set_A[set_A[attribute] == t][attribute].count()/set_A[attribute].count()
             sub_me = []
             for l in pd.unique(set_A[self.label]):
-                prob = set_A[set_A[attribute] == t][set_A[self.label] == l][self.label].count() /set_A[set_A[attribute] == t][attribute].count()
+                prob = set_A[set_A[attribute] == t][set_A[self.label] == l][self.label].count() / set_A[set_A[attribute] == t][attribute].count()
                 sub_me.append(prob)
-            output -= set_ratio*(sub_me.sort()[1])
+            sub_me.sort(reverse=True)
+            output -= set_ratio*(1 - sub_me[0])
         return output
 
     def GI(self, set_A, attribute):
