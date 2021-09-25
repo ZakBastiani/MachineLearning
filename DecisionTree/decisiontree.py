@@ -14,6 +14,10 @@ class Branch:
 
 
 class DecisionTree:
+    IG_ID = 0
+    ME_ID = 1
+    GI_ID = 2
+
     def __init__(self, train_data, attribute_types, gain_type, max_depth):
         self.data = train_data
         self.max_depth = max_depth

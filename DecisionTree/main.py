@@ -19,6 +19,6 @@ attributes_types = {
 train_df = pd.read_csv(train_data_csv, names=attributes)
 test_df = pd.read_csv(test_data_csv, names=attributes)
 all_data = pd.concat([train_df, test_df])
-tree = decisiontree.DecisionTree(train_df, attributes_types, 0, 7)
+tree = decisiontree.DecisionTree(train_df, attributes_types, decisiontree.DecisionTree.GI_ID, 7)
 acc = tree.testdata(all_data)
 print(acc)
