@@ -74,10 +74,36 @@ class DecisionTree:
         return output
 
     def ME(self, set_A, attribute):
-        return 1
+        output = 0
+        for l in pd.unique(set_A[self.label]):
+            prob = set_A[set_A[self.label] == l][self.label].count()/set_A[self.label].count()
+            output += -prob*math.log2(prob)
+        types = pd.unique(set_A[attribute])
+        for t in types:
+            set_ratio = set_A[set_A[attribute] == t][attribute].count()/set_A[attribute].count()
+            sub_entropy = 0
+            for l in pd.unique(set_A[self.label]):
+                prob = set_A[set_A[attribute] == t][set_A[self.label] == l][self.label].count() /set_A[set_A[attribute] == t][attribute].count()
+                if prob != 0:
+                    sub_entropy += -prob*math.log2(prob)
+            output -= set_ratio*sub_entropy
+        return output
 
     def GI(self, set_A, attribute):
-        return 1
+        output = 1
+        for l in pd.unique(set_A[self.label]):
+            prob = set_A[set_A[self.label] == l][self.label].count()/set_A[self.label].count()
+            output += -prob**2
+        types = pd.unique(set_A[attribute])
+        for t in types:
+            set_ratio = set_A[set_A[attribute] == t][attribute].count()/set_A[attribute].count()
+            sub_entropy = 1
+            for l in pd.unique(set_A[self.label]):
+                prob = set_A[set_A[attribute] == t][set_A[self.label] == l][self.label].count() /set_A[set_A[attribute] == t][attribute].count()
+                if prob != 0:
+                    sub_entropy += -prob**2
+            output -= set_ratio*sub_entropy
+        return output
 
     def testdata(self, test_data):
         acc = 0
