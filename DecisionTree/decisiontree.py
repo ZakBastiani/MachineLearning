@@ -75,18 +75,19 @@ class DecisionTree:
 
     def ME(self, set_A, attribute):
         output = 0
+        me = []
         for l in pd.unique(set_A[self.label]):
             prob = set_A[set_A[self.label] == l][self.label].count()/set_A[self.label].count()
-            output += -prob*math.log2(prob)
+            me.append(-prob*math.log2(prob))
+        output = me.sort()[1]
         types = pd.unique(set_A[attribute])
         for t in types:
             set_ratio = set_A[set_A[attribute] == t][attribute].count()/set_A[attribute].count()
-            sub_entropy = 0
+            sub_me = []
             for l in pd.unique(set_A[self.label]):
                 prob = set_A[set_A[attribute] == t][set_A[self.label] == l][self.label].count() /set_A[set_A[attribute] == t][attribute].count()
-                if prob != 0:
-                    sub_entropy += -prob*math.log2(prob)
-            output -= set_ratio*sub_entropy
+                sub_me.append(prob)
+            output -= set_ratio*(sub_me.sort()[1])
         return output
 
     def GI(self, set_A, attribute):
