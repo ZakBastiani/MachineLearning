@@ -36,20 +36,14 @@ class DecisionTree:
         if current_Set[self.label].unique().size == 1:
             return Node(current_Set.iloc[0][self.label])
 
-        if attributes.size == 0 or depth == self.max_depth:
+        if attributes.size == 0 or depth >= self.max_depth:
             return Node(current_Set[self.label].mode()[0])
 
         # Find the best attribute
         best_value = -1
         best_attribute = ""
-        current_Set_copy = current_Set.copy()
         for a in attributes:
-            if self.types[a][0] == 'numeric':
-                median = current_Set_copy[current_Set_copy[a] != 'unknown'][a].astype(float).median()
-                current_Set_copy.loc[current_Set_copy[a].astype(float) > median, a] = median+1
-                current_Set_copy.loc[current_Set_copy[a].astype(float) <= median, a] = median-1
-
-            value = self.gain(current_Set_copy, a)
+            value = self.gain(current_Set, a)
             if value > best_value:
                 best_value = value
                 best_attribute = a
@@ -59,31 +53,12 @@ class DecisionTree:
 
         # Split the branches into subsets for each attribute label
         for tp in self.types[best_attribute]:
-            if tp == 'numeric':
-                median = current_Set[current_Set[best_attribute] != 'unknown'][best_attribute].astype(float).median()
-                current_Set.loc[current_Set[best_attribute].astype(float) > median, best_attribute] = median+1
-                current_Set.loc[current_Set[best_attribute].astype(float) <= median, best_attribute] = median-1
-                # If a label is empty set it as the most common label inside of this attribute
-                if current_Set[current_Set[best_attribute] == median+1][self.label].count() == 0:
-                    root.branches.append(Branch(median+1, Node(current_Set[self.label].mode()[0])))
-                else:
-                    # Build a tree for every branch
-                    root.branches.append(Branch(median+1, self.buildtree(current_Set[current_Set[best_attribute] == median+1].drop(columns=best_attribute), depth+1)))
-
-                # If a label is empty set it as the most common label inside of this attribute
-                if current_Set[current_Set[best_attribute] == median-1][self.label].count() == 0:
-                    root.branches.append(Branch(median-1, Node(current_Set[self.label].mode()[0])))
-                else:
-                    # Build a tree for every branch
-                    root.branches.append(Branch(median-1, self.buildtree(current_Set[current_Set[best_attribute] == median-1].drop(columns=best_attribute), depth+1)))
-
+            # If a label is empty set it as the most common label inside of this attribute
+            if current_Set[current_Set[best_attribute] == tp][self.label].count() == 0:
+                root.branches.append(Branch(tp, Node(current_Set[self.label].mode()[0])))
             else:
-                # If a label is empty set it as the most common label inside of this attribute
-                if current_Set[current_Set[best_attribute] == tp][self.label].count() == 0:
-                    root.branches.append(Branch(tp, Node(current_Set[self.label].mode()[0])))
-                else:
-                    # Build a tree for every branch
-                    root.branches.append(Branch(tp, self.buildtree(current_Set[current_Set[best_attribute] == tp].drop(columns=best_attribute), depth+1)))
+                # Build a tree for every branch
+                root.branches.append(Branch(tp, self.buildtree(current_Set[current_Set[best_attribute] == tp].drop(columns=best_attribute), depth+1)))
 
         return root
 
@@ -144,23 +119,6 @@ class DecisionTree:
             current = self.root
             while len(current.branches) != 0:
                 att_type = r[current.attribute]
-                if self.types[current.attribute] == 'numeric':
-                    median = (current.branches[0].att_type + current.branches[1].att_type)/2
-                    if att_type > median:
-                        if current.branches[0].att_type > median:
-                            current = current.branches[0].node
-                            break
-                        else:
-                            current = current.branches[1].node
-                            break
-                    else:
-                        if current.branches[0].att_type < median:
-                            current = current.branches[0].node
-                            break
-                        else:
-                            current = current.branches[1].node
-                            break
-
                 for b in current.branches:
                     if b.att_type == att_type:
                         current = b.node

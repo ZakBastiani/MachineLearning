@@ -1,4 +1,4 @@
-import numpy
+import numpy as np
 import decisiontree
 import pandas as pd
 
@@ -45,27 +45,52 @@ attributes_types = {
 }
 train_df = pd.read_csv(train_data_csv, names=attributes)
 test_df = pd.read_csv(test_data_csv, names=attributes)
+for a in attributes:
+    if attributes_types[a][0] == 'numeric':
+        median = train_df[train_df[a] != 'unknown'][a].astype(float).median()
+        train_df.loc[train_df[a].astype(float) > median, a] = median+1
+        train_df.loc[train_df[a].astype(float) <= median, a] = median-1
+        test_df.loc[test_df[a].astype(float) > median, a] = median+1
+        test_df.loc[test_df[a].astype(float) <= median, a] = median-1
+        attributes_types[a] = [median+1, median-1]
 
-all_data = pd.concat([train_df, test_df])
+# changing unknowns to the most common attribute in the training set
+for a in attributes:
+    if "unknown" in attributes_types[a]:
+        avg = train_df.loc[train_df[a] != "unknown"][a].mode()[0]
+        train_df.loc[train_df[a] == "unknown", a] = avg
+        test_df.loc[test_df[a] == "unknown", a] = avg
+        attributes_types[a].remove("unknown")
 
-tree = decisiontree.DecisionTree(train_df, attributes_types, decisiontree.DecisionTree.IG_ID, 16)
-acc = tree.testdata(all_data)
-print(acc)
 
-print("IG Gain:")
-for i in range(1, 16):
+acc = np.zeros((6, 16))
+
+for i in range(1, 17):
+    print(i)
     tree = decisiontree.DecisionTree(train_df, attributes_types, decisiontree.DecisionTree.IG_ID, i)
-    acc = tree.testdata(all_data)
-    print("Depth : " + str(i) + ", Accuracy: " + str(acc))
+    acc[0, i-1] = tree.testdata(train_df)
+    acc[1, i-1] = tree.testdata(test_df)
+print("done with ig")
 
-print("ME Gain:")
-for i in range(1, 16):
+for i in range(1, 17):
+    print(i)
     tree = decisiontree.DecisionTree(train_df, attributes_types, decisiontree.DecisionTree.ME_ID, i)
-    acc = tree.testdata(all_data)
-    print("Depth : " + str(i) + ", Accuracy: " + str(acc))
+    acc[2, i-1] = tree.testdata(train_df)
+    acc[3, i-1] = tree.testdata(test_df)
+print("done with me")
 
-print("GI Gain:")
-for i in range(1, 16):
+for i in range(1, 17):
+    print(i)
     tree = decisiontree.DecisionTree(train_df, attributes_types, decisiontree.DecisionTree.GI_ID, i)
-    acc = tree.testdata(all_data)
-    print("Depth : " + str(i) + ", Accuracy: " + str(acc))
+    acc[4, i-1] = tree.testdata(train_df)
+    acc[5, i-1] = tree.testdata(test_df)
+print("done with gi")
+
+for i in range(16):
+    print(str(i + 1) + " & "
+          + str("{:.4f}".format(acc[0, i])) + " & "
+          + str("{:.4f}".format(acc[1, i])) + " & "
+          + str("{:.4f}".format(acc[2, i])) + " & "
+          + str("{:.4f}".format(acc[3, i])) + " & "
+          + str("{:.4f}".format(acc[4, i])) + " & "
+          + str("{:.4f}".format(acc[5, i])) + " \\\\ \hline")

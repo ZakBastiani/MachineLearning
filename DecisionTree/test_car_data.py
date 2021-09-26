@@ -1,4 +1,4 @@
-import numpy
+import numpy as np
 import decisiontree
 import pandas as pd
 
@@ -18,22 +18,30 @@ attributes_types = {
 }
 train_df = pd.read_csv(train_data_csv, names=attributes)
 test_df = pd.read_csv(test_data_csv, names=attributes)
-all_data = pd.concat([train_df, test_df])
-print("IG Gain:")
+acc = np.zeros((6, 6))
+
 for i in range(1, 7):
     tree = decisiontree.DecisionTree(train_df, attributes_types, decisiontree.DecisionTree.IG_ID, i)
-    acc = tree.testdata(all_data)
-    print("Depth : " + str(i) + ", Accuracy: " + str(acc))
+    acc[0, i-1] = tree.testdata(train_df)
+    acc[1, i-1] = tree.testdata(test_df)
 
-print("ME Gain:")
 for i in range(1, 7):
     tree = decisiontree.DecisionTree(train_df, attributes_types, decisiontree.DecisionTree.ME_ID, i)
-    acc = tree.testdata(all_data)
-    print("Depth : " + str(i) + ", Accuracy: " + str(acc))
+    acc[2, i-1] = tree.testdata(train_df)
+    acc[3, i-1] = tree.testdata(test_df)
 
-print("GI Gain:")
 for i in range(1, 7):
     tree = decisiontree.DecisionTree(train_df, attributes_types, decisiontree.DecisionTree.GI_ID, i)
-    acc = tree.testdata(all_data)
-    print("Depth : " + str(i) + ", Accuracy: " + str(acc))
+    acc[4, i-1] = tree.testdata(train_df)
+    acc[5, i-1] = tree.testdata(test_df)
+
+for i in range(6):
+    print(str(i + 1) + " & "
+          + str("{:.4f}".format(acc[0, i])) + " & "
+          + str("{:.4f}".format(acc[1, i])) + " & "
+          + str("{:.4f}".format(acc[2, i])) + " & "
+          + str("{:.4f}".format(acc[3, i])) + " & "
+          + str("{:.4f}".format(acc[4, i])) + " & "
+          + str("{:.4f}".format(acc[5, i])) + " \\\\ \hline")
+
 
