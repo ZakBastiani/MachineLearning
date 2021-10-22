@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 import decision_tree
 
+
 class BaggedTree:
     def __init__(self):
         self.train_data = []

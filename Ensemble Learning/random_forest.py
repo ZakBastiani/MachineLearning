@@ -4,6 +4,12 @@ import random_tree
 
 
 class RandomForest:
+    def __init__(self):
+        self.train_data = []
+        self.test_data = []
+
+        self.first_test_data = []
+
     def run(self, train_data, test_data, attribute_types, T, sub_set_size):
 
         # Idk what this should be set to
@@ -31,5 +37,9 @@ class RandomForest:
 
             train_err[i] = sum(abs((train_data['Label'] - np.sign(train_data['f_pred']))/2))/len(train_data)
             test_err[i] = sum(abs((test_data['Label'] - np.sign(test_data['f_pred']))/2))/len(test_data)
+            if i == 0:
+                self.first_test_data = test_data.copy()
 
+        self.train_data = train_data.copy()
+        self.test_data = test_data.copy()
         return train_err, test_err
