@@ -16,11 +16,11 @@ class RandomForest:
         sample_size = len(train_data)
 
         train_data['f_pred'] = np.zeros(len(train_data))
-        test_data['f_pred'] = np.zeros(len(train_data))
+        test_data['f_pred'] = np.zeros(len(test_data))
         train_data['pred'] = np.zeros(len(train_data))
-        test_data['pred'] = np.zeros(len(train_data))
+        test_data['pred'] = np.zeros(len(test_data))
         train_data['Miss'] = np.zeros(len(train_data))
-        test_data['Miss'] = np.zeros(len(train_data))
+        test_data['Miss'] = np.zeros(len(test_data))
 
         train_err = np.zeros(T)
         test_err = np.zeros(T)
@@ -39,6 +39,7 @@ class RandomForest:
             test_err[i] = sum(abs((test_data['Label'] - np.sign(test_data['f_pred']))/2))/len(test_data)
             if i == 0:
                 self.first_test_data = test_data.copy()
+            print(i)
 
         self.train_data = train_data.copy()
         self.test_data = test_data.copy()
