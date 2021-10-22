@@ -2,26 +2,14 @@ import numpy as np
 import pandas as pd
 
 
-class SGD:
-    def __init__(self, train_data, attributes, lr):
+class AGD:
+    def __init__(self, train_data, attributes):
         self.w = np.zeros(len(attributes))
-        self.learn_rate = []
         y = train_data.T.iloc[-1].to_numpy()
         train_data['bias'] = np.ones(len(train_data))
         train_data = train_data.drop(columns=['label'])
         x = train_data.to_numpy()
-        diff = 1
-        while diff > 0.000001:
-            error = 0
-            for i in range(len(x)):
-                error += (y[i] - self.w.T@x[i])**2
-            self.learn_rate.append(error)
-
-            sum_w = np.zeros(len(attributes)).astype(float)
-            i = np.random.randint(len(x))
-            sum_w += (y[i] - self.w.T@x[i])*(-x[i])
-            self.w = self.w - lr * sum_w
-            diff = np.linalg.norm(sum_w)
+        self.w = np.linalg.inv(x.T@x)@x.T@y.T
 
     def test(self, test_df):
         y = test_df.T.iloc[-1].to_numpy()

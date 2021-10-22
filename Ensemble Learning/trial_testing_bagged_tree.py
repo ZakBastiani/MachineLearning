@@ -1,5 +1,5 @@
 import numpy as np
-import random_forest
+import bagged_tree
 import pandas as pd
 import matplotlib.pyplot as plt
 
@@ -61,43 +61,19 @@ train_df['Label'] = train_df['Label'].apply(lambda x: '1' if x == 'yes' else '-1
 test_df['Label'] = test_df['Label'].apply(lambda x: '1' if x == 'yes' else '-1').astype(float)
 
 T = 500
-
-forest = random_forest.RandomForest()
-out2 = forest.run(train_df, test_df, attributes_types, T, 2)
-out4 = forest.run(train_df, test_df, attributes_types, T, 4)
-out6 = forest.run(train_df, test_df, attributes_types, T, 6)
+bagged = bagged_tree.BaggedTree()
+for i in range(100):
+    samp = train_df.sample(1000, replace=False, ignore_index=True)
+    out = bagged.run(samp, test_df, attributes_types, T)
 
 x = range(1, T+1)
 
-fig1 = plt.figure(1)
-ax1 = plt.axes()
-ax1.plot(x, out2[0], c='b', label='Train Accuracy')
-ax1.plot(x, out2[1], c='r', label='Test Accuracy')
-ax1.set_title("Random Forest Error with Set Size 2")
-plt.legend()
-plt.savefig("Random Forest Error with Set Size 2")
-plt.show()
-
-
 fig2 = plt.figure(2)
 ax2 = plt.axes()
-ax2.plot(x, out4[0], c='b', label='Train Accuracy')
-ax2.plot(x, out4[1], c='r', label='Test Accuracy')
-ax2.set_title("Random Forest Error with Set Size 4")
+ax2.plot(x, out[0], c='b', label='Train Accuracy')
+ax2.plot(x, out[1], c='r', label='Test Accuracy')
+ax2.set_title("Bagged Tree Error")
 plt.legend()
-plt.savefig("Random Forest Error with Set Size 4")
 plt.show()
 
-
-fig3 = plt.figure(3)
-ax3 = plt.axes()
-ax3.plot(x, out6[0], c='b', label='Train Accuracy')
-ax3.plot(x, out6[1], c='r', label='Test Accuracy')
-ax3.set_title("Random Forest Error with Set Size 6")
-plt.legend()
-plt.savefig("Random Forest Error with Set Size 6")
-plt.show()
-
-print(out2)
-print(out4)
-print(out6)
+print(out)
