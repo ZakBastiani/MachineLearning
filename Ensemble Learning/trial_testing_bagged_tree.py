@@ -60,20 +60,42 @@ test_df = test_df.rename(columns={'y': 'Label'})
 train_df['Label'] = train_df['Label'].apply(lambda x: '1' if x == 'yes' else '-1').astype(float)
 test_df['Label'] = test_df['Label'].apply(lambda x: '1' if x == 'yes' else '-1').astype(float)
 
-T = 500
+T = 100
 bagged = bagged_tree.BaggedTree()
-for i in range(100):
+single_tree_bias = 0
+single_tree_variance = 0
+
+forest_bias = 0
+forest_variance = 0
+
+for i in range(30):
     samp = train_df.sample(1000, replace=False, ignore_index=True)
     out = bagged.run(samp, test_df, attributes_types, T)
+    forest_bias += sum((bagged.test_data['Label'] - np.sign(bagged.test_data['f_pred']))**2)/len(bagged.test_data)
+    single_tree_bias += sum((bagged.first_test_data['Label'] - np.sign(bagged.first_test_data['f_pred']))**2)/len(bagged.first_test_data)
 
-x = range(1, T+1)
+    forest_mean = bagged.test_data['f_pred'].mean()
+    st_mean = bagged.first_test_data['f_pred'].mean()
+    forest_variance += sum((forest_mean - np.sign(bagged.test_data['f_pred']))**2)/(len(bagged.test_data)-1)
+    single_tree_variance += sum((forest_mean - np.sign(bagged.first_test_data['f_pred']))**2)/(len(bagged.first_test_data)-1)
 
-fig2 = plt.figure(2)
-ax2 = plt.axes()
-ax2.plot(x, out[0], c='b', label='Train Accuracy')
-ax2.plot(x, out[1], c='r', label='Test Accuracy')
-ax2.set_title("Bagged Tree Error")
-plt.legend()
-plt.show()
+    print(i)
 
-print(out)
+N = len(test_df)
+single_tree_bias = single_tree_bias/N
+single_tree_variance = single_tree_variance/N
+forest_bias = forest_bias/N
+forest_variance = forest_variance/N
+
+print('Single Tree Stats')
+print('Bias: ' + str(single_tree_bias))
+print('Variance: ' + str(single_tree_variance))
+print('GSE: ' + str(single_tree_variance + single_tree_bias))
+print()
+print('Forest Stats')
+print('Bias: ' + str(forest_bias))
+print('Variance: ' + str(forest_variance))
+print('GSE: ' + str(forest_variance + forest_bias))
+
+
+
