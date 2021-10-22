@@ -19,7 +19,7 @@ class BaggedTree:
         test_err = np.zeros(T)
 
         for i in range(T):
-            samp = train_data.sample(sample_size, replace=True, weights=train_data['prob'], ignore_index=True)
+            samp = train_data.sample(sample_size, replace=True, ignore_index=True)
             samp = samp.drop(columns=['pred', 'Miss', 'f_pred'])
             tree = decision_tree.DecisionTree(samp, attribute_types, 0, 100)
             train_data = tree.testdata(train_data)

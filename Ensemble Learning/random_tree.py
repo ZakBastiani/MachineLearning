@@ -14,13 +14,14 @@ class Branch:
         self.node = node
 
 
-class DecisionTree:
+class RandomDecisionTree:
     IG_ID = 0
     ME_ID = 1
     GI_ID = 2
 
-    def __init__(self, train_data, attribute_types, gain_type, max_depth):
+    def __init__(self, train_data, attribute_types, gain_type, max_depth, sub_set_size):
         self.data = train_data
+        self.sub_size = sub_set_size
         self.max_depth = max_depth
         self.gain = self.IG
         if gain_type == self.ME_ID:
@@ -41,10 +42,11 @@ class DecisionTree:
             return Node(current_Set[self.label].mode()[0])
 
         # Find the best attribute
+        sub_set = current_Set.sample(self.sub_size, replace=True, ignore_index=True)
         best_value = -1
         best_attribute = ""
         for a in attributes:
-            value = self.gain(current_Set, a)
+            value = self.gain(sub_set, a)
             if value > best_value:
                 best_value = value
                 best_attribute = a
