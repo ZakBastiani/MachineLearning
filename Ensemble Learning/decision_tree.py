@@ -1,5 +1,6 @@
 import math
 import pandas as pd
+import numpy as np
 
 
 class Node:
@@ -113,9 +114,12 @@ class DecisionTree:
         return output
 
     def testdata(self, test_data):
-        acc = 0
+
+        pred = np.zeros(len(test_data))
+        miss = np.zeros(len(test_data))
+
         for i in range(0, test_data[self.label].count()):
-            r = test_data.iloc[i]
+            r = test_data.iloc[i].copy()
             current = self.root
             while len(current.branches) != 0:
                 att_type = r[current.attribute]
@@ -124,7 +128,11 @@ class DecisionTree:
                         current = b.node
                         break
 
+            pred[i] = current.attribute
             if r[self.label] == current.attribute:
-                acc += 1
-        acc = acc/test_data[self.label].count()
-        return acc
+                miss[i] = 0
+            else:
+                miss[i] = 1
+        test_data['pred'] = pred
+        test_data['Miss'] = miss
+        return test_data
