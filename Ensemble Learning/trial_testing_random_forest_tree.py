@@ -60,7 +60,7 @@ test_df = test_df.rename(columns={'y': 'Label'})
 train_df['Label'] = train_df['Label'].apply(lambda x: '1' if x == 'yes' else '-1').astype(float)
 test_df['Label'] = test_df['Label'].apply(lambda x: '1' if x == 'yes' else '-1').astype(float)
 
-T = 250
+T = 500
 forest = random_forest.RandomForest()
 single_tree_bias = 0
 single_tree_variance = 0
@@ -68,7 +68,7 @@ single_tree_variance = 0
 forest_bias = 0
 forest_variance = 0
 
-for i in range(30):
+for i in range(100):
     samp = train_df.sample(1000, replace=False, ignore_index=True)
     out6 = forest.run(train_df, test_df, attributes_types, T, 6)
     forest_bias += sum((forest.test_data['Label'] - np.sign(forest.test_data['f_pred']))**2)/len(forest.test_data)
@@ -79,7 +79,6 @@ for i in range(30):
     forest_variance += sum((forest_mean - np.sign(forest.test_data['f_pred']))**2)/(len(forest.test_data)-1)
     single_tree_variance += sum((forest_mean - np.sign(forest.first_test_data['f_pred']))**2)/(len(forest.first_test_data)-1)
 
-    print(i)
 
 N = len(test_df)
 single_tree_bias = single_tree_bias/N
