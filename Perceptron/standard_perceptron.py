@@ -13,7 +13,6 @@ class StandPerceptron:
 
     def build(self):
         for i in range(self.T):
-            print(i)
             data = self.train_data.sample(len(self.train_data), replace=False, ignore_index=True)
             for j in range(len(data)):
                 x = data.drop(columns=['label']).iloc[j].to_numpy()
