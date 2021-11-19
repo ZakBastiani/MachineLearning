@@ -19,7 +19,7 @@ class BGD:
 
             sum_w = np.zeros(len(attributes)).astype(float)
             for i in range(len(x)):
-                sum_w += (y[i] - self.w.T@x[i])*(-x[i])
+                sum_w += 2*(y[i] - self.w.T@x[i])*(-x[i])
             self.w = self.w - lr * sum_w
             diff = np.linalg.norm(sum_w)
 
