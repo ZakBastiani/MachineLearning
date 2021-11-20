@@ -1,5 +1,6 @@
 This folder contains two SVM methods. Both of them follow a stand set up of declearing the model and passing in the test
-data, followed by asking to make predictions.
+data, followed by asking to make predictions. Use ruh.sh to run the test file, which will run all of the questions 
+detailed in the assignment.
 
 primSVM: 
 
