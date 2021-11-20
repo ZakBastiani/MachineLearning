@@ -40,7 +40,8 @@ class PrimSvd:
     def lr_inc_a(self, t):
         return self.lr/(1 + (self.lr*t)/self.a)
 
-    def predict(self, test_data):
+    def predict(self, input_data):
+        test_data = input_data.copy()
         pred = np.zeros(len(test_data))
         test_data['bias'] = np.ones(len(test_data))
         for i in range(len(test_data)):
