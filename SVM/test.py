@@ -26,7 +26,7 @@ weights = []
 
 print('Using learning rate change with a:')
 for C in C_list:
-    prim = prim_SVM.PrimSvd(train_df, T, lr, C, a, 0)
+    prim = primSVM.PrimSvd(train_df, T, lr, C, a, 0)
     pred_train = prim.predict(train_df.drop(columns=['label']))
     pred_test = prim.predict(test_df.drop(columns=['label']))
 

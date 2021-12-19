@@ -1,0 +1,3 @@
+In this file contains all of the methods that I attempted to try to solve the kaggle problem of income level prediction. The files that end in model are used to call the model, predict the test data. All the other files are my past implementations of machine learning methods. If you want to run the code used to gernerate my final model use the line of code below. It calls the file tree_model which uses a decision tree with alot of data processing.
+
+python3 tree_model.py
